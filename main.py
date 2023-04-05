@@ -16,6 +16,7 @@ valeurs = [
     [0,0,1,9,0,4,5,7,0] #8
 ]
 
+
 g1 = Grille(valeurs)
 
 print(g1.get_possibilites())

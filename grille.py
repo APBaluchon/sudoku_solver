@@ -128,5 +128,3 @@ class Grille:
 
     def solve(self):
         liste_possibilites = self.get_possibilities()
-
-        
