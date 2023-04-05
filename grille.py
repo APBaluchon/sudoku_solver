@@ -12,6 +12,7 @@ class Grille:
 
     def __init__(self, valeurs):
         self.valeurs = valeurs
+        self.liste_possibilites = self.get_possibilities()
 
     def at(self, i, j):
         """
@@ -48,7 +49,7 @@ class Grille:
             Le nombre de valeurs possible dans la case donnée
         """
         res = 0
-        if self.valeurs[i][j] != 0:
+        if self.valeurs[i][j] == 0:
             for n in range(1, 10):
                 if self.is_value_possible(n, i, j):
                     res += 1
@@ -72,7 +73,7 @@ class Grille:
         bool
             True si la valeur peut-être mise dans la case, False sinon
         """
-        if self.is_value_in_row(n, i) or self.is_value_in_column(n, j):
+        if self.is_value_in_row(n, i) or self.is_value_in_column(n, j) or self.is_value_in_square(n, i, j):
             return False
         else:
             return True
@@ -113,6 +114,9 @@ class Grille:
             True si la valeur n est dans la colonne, False sinon
         """
         return n in [self.valeurs[i][j] for i in range(9)]
+    
+    def is_value_in_square(self, n, i, j):
+        pass
 
     def get_possibilities(self):
         """
@@ -123,8 +127,43 @@ class Grille:
         list
             Retourne une liste de tuple, le premier élément correpond à la case, le second au nombre de possibilités
         """   
-        d = {(i, j):self.number_of_possibilites(i, j) for i,j in itertools.product(range(1,9), range(1,9)) if self.number_of_possibilites(i, j) != 0}
+        d = {(i, j):self.number_of_possibilites(i, j) for i,j in itertools.product(range(9), range(9)) if self.number_of_possibilites(i, j) != 0}
         return sorted(d.items(), key=lambda x : x[1], reverse=True)
 
+    def is_completed(self):
+        """
+        Indique si une grille est complétée
+
+        Return
+        ------
+        bool
+            True si la grille est complétée, False sinon
+        """
+        return len(self.get_possibilities())==0
+    
+    def is_ok(self, index):
+        i = self.liste_possibilites[index][0][0]
+        j = self.liste_possibilites[index][0][1]
+
+        for n in range(self.valeurs[i][j]+1,10):
+            if self.is_value_possible(n, i, j):
+                self.valeurs[i][j] = n
+                self.display()
+                if index != len(self.liste_possibilites)-1:
+                    self.is_ok(index+1)
+                else:
+                    return True
+
+        return self.is_ok(index-1)
+
+
+    def display(self):
+        for i in range(9):
+            print(" ".join(str(self.valeurs[i][j]) for j in range(9)))
+        print("\n\n")
+
     def solve(self):
-        liste_possibilites = self.get_possibilities()
+        self.is_ok(0)
+
+        return self.valeurs
+

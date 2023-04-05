@@ -19,5 +19,5 @@ valeurs = [
 
 g1 = Grille(valeurs)
 
-print(g1.get_possibilites())
+print(g1.solve())
 
