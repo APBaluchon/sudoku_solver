@@ -1,4 +1,5 @@
 import itertools
+import sys
 
 class Grille:
     """
@@ -116,7 +117,31 @@ class Grille:
         return n in [self.valeurs[i][j] for i in range(9)]
     
     def is_value_in_square(self, n, i, j):
-        pass
+        """
+        Indique si la valeur n est dans le carré (3x3) où se trouve la case de coordonnées i, j
+
+        Parameters
+        ----------
+        n : int
+            La valeur à tester
+        i : int
+            La ligne
+        j : int
+            La colonne
+
+        Return
+        ------
+        bool
+            True si la valeur n est dans le carré, False sinon
+        """
+        a = i//3
+        b = j//3
+        for ligne in range(3):
+            for colonne in range(3):
+                if (3*a+ligne, 3*b+colonne) != (i, j):
+                    if self.valeurs[3*a+ligne][3*b+colonne] == n:
+                        return True
+        return False
 
     def get_possibilities(self):
         """
@@ -128,7 +153,7 @@ class Grille:
             Retourne une liste de tuple, le premier élément correpond à la case, le second au nombre de possibilités
         """   
         d = {(i, j):self.number_of_possibilites(i, j) for i,j in itertools.product(range(9), range(9)) if self.number_of_possibilites(i, j) != 0}
-        return sorted(d.items(), key=lambda x : x[1], reverse=True)
+        return sorted(d.items(), key=lambda x : x[1])
 
     def is_completed(self):
         """
@@ -141,30 +166,34 @@ class Grille:
         """
         return len(self.get_possibilities())==0
     
-    def is_ok(self, index):
-        i = self.liste_possibilites[index][0][0]
-        j = self.liste_possibilites[index][0][1]
+    def solve_backtracking(self):
+        """
+        Fonction pour résoudre la grille
+        """
+        
+        index = 0
 
-        for n in range(self.valeurs[i][j]+1,10):
-            if self.is_value_possible(n, i, j):
-                self.valeurs[i][j] = n
-                self.display()
-                if index != len(self.liste_possibilites)-1:
-                    self.is_ok(index+1)
-                else:
-                    return True
+        while(self.is_completed() == False):
+            i = self.liste_possibilites[index][0][0]
+            j = self.liste_possibilites[index][0][1]
+            actual_value = self.valeurs[i][j]
+            self.valeurs[i][j] = 0
 
-        return self.is_ok(index-1)
+            for n in range(actual_value+1,10):
+                if(self.is_value_possible(n, i, j)):
+                    self.valeurs[i][j] = n
+                    index += 1
+                    break
+                if n == 9:
+                    index -= 1
 
 
+    def __str__(self):
+        res = ""
 
-    def display(self):
         for i in range(9):
-            print(" ".join(str(self.valeurs[i][j]) for j in range(9)))
-        print("\n\n")
+            for j in range(9):
+                res += str(self.valeurs[i][j])+" "
+            res += "\n"
 
-    def solve(self):
-        self.is_ok(0)
-
-        return self.valeurs
-
+        return res
