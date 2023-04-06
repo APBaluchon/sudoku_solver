@@ -157,6 +157,7 @@ class Grille:
         return self.is_ok(index-1)
 
 
+
     def display(self):
         for i in range(9):
             print(" ".join(str(self.valeurs[i][j]) for j in range(9)))
